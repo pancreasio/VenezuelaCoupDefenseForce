@@ -766,6 +766,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 337427678867c5a448c08dd5c8c28607, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  baseRotationSpeed: 3
+  cannonRotationSpeed: 3
+  chamber: {fileID: 1111674982}
 --- !u!1 &1490688268
 GameObject:
   m_ObjectHideFlags: 0
