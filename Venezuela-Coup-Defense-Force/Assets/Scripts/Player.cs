@@ -12,16 +12,20 @@ public class Player : MonoBehaviour
     private Vector3 cannonTargetPos;
     private Transform baseTargetRotation;
     private Transform cannonTargetRotation;
+    private bool shot;
 
     public float baseRotationSpeed;
     public float cannonRotationSpeed;
     public Transform chamber;
+    public Transform missileSpawnPoint;
+    public GameObject missile;
 
     private void Start()
     {
         target = null;
         baseTargetRotation = new GameObject().transform;
         cannonTargetRotation = new GameObject().transform;
+        shot = false;
     }
 
     private void Update()
@@ -34,7 +38,7 @@ public class Player : MonoBehaviour
                 target = hit.transform.gameObject;
                 baseTargetPos = new Vector3(hit.transform.position.x, 0, hit.transform.position.z);
                 cannonTargetPos = new Vector3(hit.transform.position.x, hit.transform.position.y, hit.transform.position.z);
-                Debug.Log(hit.collider.name);
+                shot = false;
                 Debug.DrawRay(ray.origin, ray.direction * Vector3.Distance(ray.origin, hit.transform.position), Color.red, 1);
             }
         }
@@ -43,16 +47,22 @@ public class Player : MonoBehaviour
             baseTargetRotation.transform.LookAt(baseTargetPos);
             cannonTargetRotation.transform.LookAt(cannonTargetPos);
             transform.rotation = Quaternion.Lerp(transform.rotation, baseTargetRotation.rotation, baseRotationSpeed * Time.deltaTime);
-            if (transform.rotation == baseTargetRotation.rotation|| Quaternion.Angle(transform.rotation, baseTargetRotation.rotation) <3)
+            if (Quaternion.Angle(transform.rotation, baseTargetRotation.rotation) <3)
             {
                 chamber.rotation = Quaternion.Lerp(chamber.rotation, cannonTargetRotation.rotation, cannonRotationSpeed * Time.deltaTime);
+                if (Quaternion.Angle(chamber.rotation, cannonTargetRotation.rotation) < 1 && !shot)
+                {
+                    Fire();
+                    shot = true;
+                }
             }
         }
     }
 
     private void Fire()
     {
-
+        GameObject newMissile = Instantiate(missile, missileSpawnPoint.transform.position, chamber.rotation * Quaternion.AngleAxis(90, Vector3.right));
+        newMissile.GetComponent<Missile>().target = target.gameObject;
     }
 }
 

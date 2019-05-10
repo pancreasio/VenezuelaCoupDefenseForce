@@ -4,15 +4,10 @@ using UnityEngine;
 
 public class Box : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public float speed;
 
-    // Update is called once per frame
-    void Update()
+    private void FixedUpdate()
     {
-        
+        transform.position = new Vector3(transform.position.x, transform.position.y - speed, transform.position.z);
     }
 }

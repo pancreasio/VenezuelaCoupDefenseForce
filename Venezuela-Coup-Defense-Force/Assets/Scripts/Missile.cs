@@ -4,15 +4,45 @@ using UnityEngine;
 
 public class Missile : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private GameObject targetReticle;
+    private Rigidbody rigi;
+    private bool accelerate;
+
+    public float initialSpeed;
+    public float speed;
+    public float superHomingDistance;
+    public float rotationSpeed;
+    public GameObject target;
+
+    private void Start()
     {
-        
+        accelerate = true;
+        targetReticle = new GameObject();
+        rigi = transform.GetComponent<Rigidbody>();
+    }
+    private void FixedUpdate()
+    {
+        targetReticle.transform.position = transform.position;
+        targetReticle.transform.LookAt(target.transform);
+        if (Vector3.Distance(transform.position, target.transform.position) > superHomingDistance)
+        {
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetReticle.transform.rotation, rotationSpeed);
+        }
+        else
+        {
+            transform.LookAt(target.transform.position);
+        }
+        if (accelerate)
+        {
+            rigi.AddForce(transform.forward * initialSpeed, ForceMode.Impulse);
+            accelerate = false;
+        }
+        rigi.AddForce(transform.forward * speed, ForceMode.Force);
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnCollisionEnter(Collision collision)
     {
-        
+        Destroy(collision.gameObject);
+        Destroy(this.gameObject);
     }
 }
