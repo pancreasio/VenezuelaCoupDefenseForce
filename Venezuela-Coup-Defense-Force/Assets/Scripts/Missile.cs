@@ -31,6 +31,7 @@ public class Missile : MonoBehaviour
         else
         {
             transform.LookAt(target.transform.position);
+            rigi.velocity.Set(0, 0, 0);
         }
         if (accelerate)
         {
