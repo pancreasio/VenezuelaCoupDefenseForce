@@ -10,8 +10,7 @@ public class Player : MonoBehaviour
     private GameObject target;
     private Vector3 baseTargetPos;
     private Vector3 cannonTargetPos;
-    private Transform baseTargetRotation;
-    private Transform cannonTargetRotation;
+    private Transform baseTargetRotation, cannonTargetRotation, originalRotation, originalChamberRotation;
     private bool shot;
 
     public float baseRotationSpeed;
@@ -36,24 +35,34 @@ public class Player : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
                 target = hit.transform.gameObject;
-                baseTargetPos = new Vector3(hit.transform.position.x, 0, hit.transform.position.z);
-                cannonTargetPos = new Vector3(hit.transform.position.x, hit.transform.position.y, hit.transform.position.z);
-                shot = false;
-                Debug.DrawRay(ray.origin, ray.direction * Vector3.Distance(ray.origin, hit.transform.position), Color.red, 1);
+                if (target.transform.tag == "Box")
+                {
+                    baseTargetPos = new Vector3(hit.transform.position.x, 0, hit.transform.position.z);
+                    cannonTargetPos = new Vector3(hit.transform.position.x, hit.transform.position.y, hit.transform.position.z);
+                    shot = false;
+                    Debug.DrawRay(ray.origin, ray.direction * Vector3.Distance(ray.origin, hit.transform.position), Color.red, 1);
+                    originalRotation = transform;
+                    originalChamberRotation = chamber.transform;
+                    baseTargetRotation.transform.LookAt(baseTargetPos);
+                    cannonTargetRotation.transform.LookAt(cannonTargetPos);
+                }
+                else
+                {
+                    target = null;
+                }
             }
         }
         if (target != null)
         {
-            baseTargetRotation.transform.LookAt(baseTargetPos);
-            cannonTargetRotation.transform.LookAt(cannonTargetPos);
-            transform.rotation = Quaternion.Lerp(transform.rotation, baseTargetRotation.rotation, baseRotationSpeed * Time.deltaTime);
-            if (Quaternion.Angle(transform.rotation, baseTargetRotation.rotation) <3)
+            transform.rotation = Quaternion.Lerp(originalRotation.rotation, baseTargetRotation.rotation, baseRotationSpeed * Time.deltaTime);
+            if (Quaternion.Angle(transform.rotation, baseTargetRotation.rotation) < 3)
             {
-                chamber.rotation = Quaternion.Lerp(chamber.rotation, cannonTargetRotation.rotation, cannonRotationSpeed * Time.deltaTime);
-                if (Quaternion.Angle(chamber.rotation, cannonTargetRotation.rotation) < 1 && !shot)
+                chamber.rotation = Quaternion.Lerp(originalChamberRotation.rotation, cannonTargetRotation.rotation, cannonRotationSpeed * Time.deltaTime);
+                if (Quaternion.Angle(chamber.rotation, cannonTargetRotation.rotation) < 3 && !shot)
                 {
                     Fire();
                     shot = true;
+                    target = null;
                 }
             }
         }
@@ -61,7 +70,7 @@ public class Player : MonoBehaviour
 
     private void Fire()
     {
-        GameObject newMissile = Instantiate(missile, missileSpawnPoint.transform.position, chamber.rotation * Quaternion.AngleAxis(90, Vector3.right));
+        GameObject newMissile = Instantiate(missile, missileSpawnPoint.transform.position, chamber.rotation);
         newMissile.GetComponent<Missile>().target = target.gameObject;
     }
 }
