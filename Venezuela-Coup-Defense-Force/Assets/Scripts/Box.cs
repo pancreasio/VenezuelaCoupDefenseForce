@@ -30,7 +30,7 @@ public class Box : MonoBehaviour
     private void Die()
     {
         BoxKilled?.Invoke();
-        Explode();
+        Destroy(this.gameObject);
     }
 
     private void OnTriggerEnter(Collider other)

@@ -33,7 +33,10 @@ public class LevelManager : MonoBehaviour
         if (game)
         {
             delayClock += Time.deltaTime;
-            Debug.Log("spawned boxes: "+ spawnedBoxes + " destroyed boxes: " + destroyedBoxes);
+            if (GameManager.score < 0)
+            {
+                GameManager.score = 0;
+            }
             scoreText.text = "Score: " + GameManager.score;
             if (delayClock >= boxDelay && spawnedBoxes<topBoxes)
             {
@@ -62,12 +65,14 @@ public class LevelManager : MonoBehaviour
 
     private void BoxKilled()
     {
+        destroyedBoxes++;
         GameManager.score += 100;
     }
 
     private void BoxDestroyed()
     {
         destroyedBoxes++;
+        GameManager.score -= 75;
     }
 
     public void Menu()
