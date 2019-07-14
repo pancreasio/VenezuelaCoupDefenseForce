@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +7,10 @@ public class Box : MonoBehaviour
 {
     public float speed, rotationSpeed;
     public GameObject gun;
+    public delegate void BoxKilledAction();
+    public BoxKilledAction BoxKilled;
+    public delegate void BoxDestroyedAction();
+    public BoxDestroyedAction BoxDestroyed;
 
     private void FixedUpdate()
     {
@@ -18,18 +23,27 @@ public class Box : MonoBehaviour
         if (collision.transform.tag == "Missile")
         {
             Instantiate(gun, transform.position, Quaternion.identity);
-            Destroy(this.gameObject);
-        }
-        if (collision.transform.tag == "Floor")
-        {
-            Destroy(this.gameObject);
+            Die();
         }
     }
+
+    private void Die()
+    {
+        BoxKilled?.Invoke();
+        Explode();
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.transform.tag == "Floor")
         {
-            Destroy(this.gameObject);
+            Explode();
         }
+    }
+
+    private void Explode()
+    {
+        BoxDestroyed?.Invoke();
+        Destroy(this.gameObject);
     }
 }
